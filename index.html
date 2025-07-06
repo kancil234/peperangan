@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秦使王如何同一天下</title>
+    <style>
+        body {
+            font-family: 'SimSun', '宋体', serif;
+            background-color: #f5e8c0;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-image: url('https://img.freepik.com/free-vector/chinese-pattern-background_53876-90035.jpg');
+            background-size: cover;
+        }
+        #game-container {
+            background-color: rgba(255, 255, 255, 0.85);
+            border: 3px solid #8B4513;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #8B0000;
+            text-align: center;
+            text-shadow: 1px 1px 2px #ccc;
+            border-bottom: 2px solid #8B4513;
+            padding-bottom: 10px;
+        }
+        #story {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            min-height: 150px;
+        }
+        #options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #8B4513;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #A0522D;
+        }
+        #stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px dashed #8B4513;
+        }
+        .stat {
+            text-align: center;
+        }
+        #map {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #map img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #8B4513;
+        }
+        #ending {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B0000;
+            margin-top: 20px;
+        }
+        #battle-report {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(139, 0, 0, 0.1);
+            border-left: 3px solid #8B0000;
+            display: none;
+        }
+        #soldier-selector {
+            margin: 10px 0;
+            display: none;
+        }
+        #soldier-slider {
+            width: 100%;
+        }
+        #soldier-count {
+            text-align: center;
+            font-weight: bold;
+        }
+        .enemy-info {
+            font-style: italic;
+            color: #8B0000;
+            margin: 5px 0;
+        }
+        .battle-turn {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dotted #ccc;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .battle-images {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .army-image {
+            width: 100px;
+            height: 80px;
+            object-fit: contain;
+            transition: all 0.5s;
+        }
+        .vs-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8B0000;
+        }
+        .battle-outcome {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #8B0000;
+            text-align: center;
+            font-size: 18px;
+            padding: 10px;
+            background-color: rgba(139, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .battle-description {
+            flex-grow: 1;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            border-radius: 5px;
+            background-color: #8B0000;
+            width: 100%;
+            transition: width 1s;
+        }
+        .army-count {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        #battle-animation {
+            display: none;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .battlefield {
+            position: relative;
+            height: 200px;
+            background-image: url('https://img.freepik.com/free-vector/hand-painted-watercolor-chinese-mountain-landscape_52683-77143.jpg');
+            background-size: cover;
+            border: 2px solid #8B4513;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .soldier {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: all 1s;
+        }
+        .qin-soldier {
+            background-image: url('https://cdn-icons-png.flaticon.com/512/6213/6213731.png');
+            left: 20%;
+        }
+        .enemy-soldier {
+            background-image: url('https://cdn-icons-png.flaticon.com/512/6213/6213739.png');
+            right: 20%;
+        }
+        .arrow {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/1828/1828665.png');
+            background-size: contain;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>秦使王如何同一天下</h1>
+        
+        <div id="story">
+            <p>公元前246年，你继承了秦国的王位，成为秦王政（后来的秦始皇）。战国七雄争霸，你的目标是统一六国，建立中国历史上第一个中央集权的帝国。</p>
+            <p>你将面临军事、外交、内政等多方面的挑战。你的决策将决定秦国能否完成统一大业。</p>
+        </div>
+        
+        <div id="options">
+            <button onclick="makeChoice(1)">开始你的统一之路</button>
+        </div>
+        
+        <div id="soldier-selector">
+            <p>选择出征士兵数量: <span id="soldier-count">0</span>千</p>
+            <input type="range" id="soldier-slider" min="0" max="100" value="0">
+            <button id="confirm-battle" onclick="confirmBattle()">确认出征</button>
+        </div>
+        
+        <div id="battle-animation">
+            <div class="battlefield" id="battlefield"></div>
+        </div>
+        
+        <div id="battle-report"></div>
+        
+        <div id="stats">
+            <div class="stat">军队: <span id="military">100</span>千</div>
+            <div class="stat">民心: <span id="popularity">70</span></div>
+            <div class="stat">国库: <span id="treasury">80</span>万金</div>
+            <div class="stat">年份: 公元前<span id="year">246</span></div>
+        </div>
+        
+        <div id="map">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Warring_States_Map_-_260_BCE.png/800px-Warring_States_Map_-_260_BCE.png" alt="战国地图">
+        </div>
+        
+        <div id="ending"></div>
+    </div>
+
+    <script>
+        // Game state
+        const state = {
+            military: 100,
+            popularity: 70,
+            treasury: 80,
+            year: 246,
+            conquered: [],
+            currentScene: 0,
+            currentBattle: null,
+            selectedSoldiers: 0
+        };
+
+        // Enemy data
+        const enemies = {
+            "韩国": { 
+                strength: 30, 
+                soldiers: 40, 
+                tactics: 60,
+                flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Flag_of_South_Korea.svg/1200px-Flag_of_South_Korea.svg.png"
+            },
+            "赵国": { 
+                strength: 50, 
+                soldiers: 60, 
+                tactics: 70,
+                flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/1200px-Flag_of_the_People%27s_Republic_of_China.svg.png"
+            },
+            "魏国": { 
+                strength: 40, 
+                soldiers: 50, 
+                tactics: 65,
+                flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/1200px-Flag_of_the_People%27s_Republic_of_China.svg.png"
+            },
+            "楚国": { 
+                strength: 70, 
+                soldiers: 80, 
+                tactics: 75,
+                flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/1200px-Flag_of_the_People%27s_Republic_of_China.svg.png"
+            },
+            "燕国": { 
+                strength: 35, 
+                soldiers: 45, 
+                tactics: 55,
+                flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/1200px-Flag_of_the_People%27s_Republic_of_China.svg.png"
+            },
+            "齐国": { 
+                strength: 60, 
+                soldiers: 70, 
+                tactics: 80,
+                flag: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/1200px-Flag_of_the_People%27s_Republic_of_China.svg.png"
+            }
+        };
+
+        // Scenes data
+        const scenes = [
+            {
+                text: "你刚刚即位，秦国正处于上升期但面临六国威胁。丞相吕不韦建议先巩固内政，而将军王翦主张立即攻打韩国。你会选择:",
+                options: [
+                    { text: "听从吕不韦，发展农业和军事工业", 
+                      effect: { military: 10, popularity: 5, treasury: -20, year: 2 } },
+                    { text: "支持王翦，准备攻打韩国", 
+                      action: "prepareBattle", target: "韩国" },
+                    { text: "双管齐下，一边发展一边准备战争", 
+                      effect: { military: -5, popularity: -5, treasury: -10, year: 2 } }
+                ]
+            },
+            {
+                text: "韩国已被削弱，但其他五国开始警惕。赵国派使者提议联盟对抗齐国。你会:",
+                options: [
+                    { text: "接受联盟，集中力量对抗齐国", 
+                      action: "prepareBattle", target: "齐国" },
+                    { text: "拒绝联盟，准备攻打赵国", 
+                      action: "prepareBattle", target: "赵国" },
+                    { text: "假装同意联盟，实则准备偷袭赵国", 
+                      effect: { popularity: -10, action: "prepareBattle", target: "赵国", surprise: true } }
+                ]
+            },
+            {
+                text: "随着领土扩张，你需要决定如何管理新征服的地区。大臣们意见不一:",
+                options: [
+                    { text: "实行郡县制，直接中央管辖", 
+                      effect: { popularity: -15, military: 10, treasury: 5, year: 1 } },
+                    { text: "保留当地贵族，实行间接统治", 
+                      effect: { popularity: 5, military: -5, year: 1 } },
+                    { text: "强制移民，将秦人迁往新领土", 
+                      effect: { popularity: -20, military: 15, treasury: -10, year: 2 } }
+                ]
+            },
+            {
+                text: "楚国联合魏国准备对抗秦国。你会采取什么策略?",
+                options: [
+                    { text: "派间谍离间楚魏联盟", 
+                      effect: { military: 5, treasury: -15, conquered: ["魏国"], year: 2 } },
+                    { text: "先发制人，全力攻打楚国", 
+                      action: "prepareBattle", target: "楚国" },
+                    { text: "修建防御工事，等待对方进攻", 
+                      effect: { military: 10, popularity: 5, treasury: -20, year: 2 } }
+                ]
+            },
+            {
+                text: "只剩下燕国和齐国尚未征服。燕国太子丹派荆轲刺杀你但失败了。你会:",
+                options: [
+                    { text: "立即报复，全力攻打燕国", 
+                      action: "prepareBattle", target: "燕国" },
+                    { text: "先稳定国内，再处理燕国", 
+                      effect: { military: 10, popularity: 10, treasury: -10, year: 2 } },
+                    { text: "派刺客暗杀燕国太子丹", 
+                      effect: { military: 5, popularity: -5, treasury: -5, conquered: ["燕国"], year: 1 } }
+                ]
+            }
+        ];
+
+        // Game functions
+        function updateStats() {
+            document.getElementById('military').textContent = state.military;
+            document.getElementById('popularity').textContent = state.popularity;
+            document.getElementById('treasury').textContent = state.treasury;
+            document.getElementById('year').textContent = state.year;
+        }
+
+        function applyEffects(effects) {
+            state.military = Math.max(0, state.military + (effects.military || 0));
+            state.popularity = Math.max(0, state.popularity + (effects.popularity || 0));
+            state.treasury = Math.max(0, state.treasury + (effects.treasury || 0));
+            state.year -= effects.year || 0;
+            
+            if (effects.conquered) {
+                effects.conquered.forEach(country => {
+                    if (!state.conquered.includes(country)) {
+                        state.conquered.push(country);
+                    }
+                });
+            }
+        }
+
+        function checkEnding() {
+            if (state.military <= 0) {
+                return "你的军队太弱，被六国联军击败。秦国灭亡！";
+            }
+            if (state.popularity <= 0) {
+                return "民怨沸腾，爆发大规模起义。你被推翻！";
+            }
+            if (state.treasury <= 0) {
+                return "国库空虚，无法维持国家运转。秦国崩溃！";
+            }
+            if (state.conquered.length >= 6) {
+                return `公元前${state.year}年，你成功统一六国，建立秦朝，成为中国历史上第一位皇帝——秦始皇！`;
+            }
+            if (state.year <= 220) {
+                return "时间耗尽，你未能完成统一大业。历史将你遗忘...";
+            }
+            return null;
+        }
+
+        function prepareBattle(target, surprise = false) {
+            state.currentBattle = {
+                target: target,
+                enemy: {...enemies[target]},
+                surprise: surprise,
+                turns: []
+            };
+            
+            if (surprise) {
+                state.currentBattle.enemy.soldiers = Math.floor(state.currentBattle.enemy.soldiers * 0.7);
+            }
+            
+            document.getElementById('soldier-selector').style.display = 'block';
+            document.getElementById('soldier-slider').max = state.military;
+            document.getElementById('soldier-slider').value = Math.floor(state.military * 0.6);
+            updateSoldierCount();
+            
+            document.getElementById('story').innerHTML += `
+                <div class="enemy-info">
+                    <p>敌军情报: ${target}军约有${state.currentBattle.enemy.soldiers}千士兵</p>
+                    <p>${surprise ? '突袭效果: 敌军尚未完全准备，数量减少30%' : ''}</p>
+                </div>
+            `;
+            
+            document.getElementById('options').innerHTML = '';
+        }
+
+        function updateSoldierCount() {
+            state.selectedSoldiers = parseInt(document.getElementById('soldier-slider').value);
+            document.getElementById('soldier-count').textContent = state.selectedSoldiers;
+        }
+
+        function confirmBattle() {
+            document.getElementById('soldier-selector').style.display = 'none';
+            
+            if (state.selectedSoldiers <= 0) {
+                document.getElementById('story').innerHTML += '<p>你没有派出任何士兵，放弃了这次进攻机会。</p>';
+                nextScene();
+                return;
+            }
+            
+            // Deduct soldiers
+            state.military -= state.selectedSoldiers;
+            
+            // Show battle animation
+            showBattleAnimation(state.selectedSoldiers, state.currentBattle.enemy.soldiers);
+            
+            // Execute battle after animation
+            setTimeout(() => {
+                const battleResult = simulateBattle(
+                    state.selectedSoldiers, 
+                    state.currentBattle.enemy.soldiers,
+                    state.currentBattle.enemy.tactics,
+                    state.currentBattle.surprise
+                );
+                
+                displayBattleResult(battleResult);
+                
+                // Apply battle results
+                state.military += battleResult.qinSurvivors;
+                if (battleResult.victory) {
+                    state.conquered.push(state.currentBattle.target);
+                    state.treasury += Math.floor(state.currentBattle.enemy.soldiers * 0.5); // Loot
+                    state.popularity += 5;
+                    document.getElementById('story').innerHTML += `<p>你成功征服了${state.currentBattle.target}!</p>`;
+                } else {
+                    state.popularity -= 10;
+                    document.getElementById('story').innerHTML += `<p>攻打${state.currentBattle.target}失败!</p>`;
+                }
+                
+                updateStats();
+                
+                // Show results longer before continuing
+                setTimeout(nextScene, 8000);
+            }, 3000);
+        }
+
+        function showBattleAnimation(qinSoldiers, enemySoldiers) {
+            const battlefield = document.getElementById('battlefield');
+            battlefield.innerHTML = '';
+            document.getElementById('battle-animation').style.display = 'block';
+            
+            // Scale down for display
+            const qinCount = Math.min(20, Math.ceil(qinSoldiers / 5));
+            const enemyCount = Math.min(20, Math.ceil(enemySoldiers / 5));
+            
+            // Create Qin soldiers
+            for (let i = 0; i < qinCount; i++) {
+                const soldier = document.createElement('div');
+                soldier.className = 'soldier qin-soldier';
+                soldier.style.top = `${20 + (i % 10) * 15}px`;
+                soldier.style.left = `${20 + Math.floor(i / 10) * 20}px`;
+                battlefield.appendChild(soldier);
+            }
+            
+            // Create enemy soldiers
+            for (let i = 0; i < enemyCount; i++) {
+                const soldier = document.createElement('div');
+                soldier.className = 'soldier enemy-soldier';
+                soldier.style.top = `${20 + (i % 10) * 15}px`;
+                soldier.style.right = `${20 + Math.floor(i / 10) * 20}px`;
+                battlefield.appendChild(soldier);
+            }
+            
+            // Animate battle
+            setTimeout(() => {
+                const qinSoldiers = document.querySelectorAll('.qin-soldier');
+                const enemySoldiers = document.querySelectorAll('.enemy-soldier');
+                
+                // Move towards each other
+                qinSoldiers.forEach(soldier => {
+                    soldier.style.left = `${parseInt(soldier.style.left) + 100}px`;
+                });
+                
+                enemySoldiers.forEach(soldier => {
+                    soldier.style.right = `${parseInt(soldier.style.right) + 100}px`;
+                });
+                
+                // Add some arrows flying
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const arrow = document.createElement('div');
+                        arrow.className = 'arrow';
+                        arrow.style.top = `${50 + i * 20}px`;
+                        arrow.style.left = '40%';
+                        battlefield.appendChild(arrow);
+                        
+                        setTimeout(() => {
+                            arrow.style.left = '60%';
+                            setTimeout(() => {
+                                arrow.remove();
+                            }, 500);
+                        }, 100);
+                    }, i * 200);
+                }
+            }, 500);
+        }
+
+        function displayBattleResult(battleResult) {
+            document.getElementById('battle-animation').style.display = 'none';
+            
+            let reportHTML = '<h3>战斗报告: 秦 vs ' + state.currentBattle.target + '</h3>';
+            
+            // Add army flags and initial counts
+            reportHTML += `
+                <div class="battle-images">
+                    <div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/1200px-Flag_of_the_People%27s_Republic_of_China.svg.png" class="army-image" alt="秦军">
+                        <div class="army-count">${state.selectedSoldiers}千士兵</div>
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div>
+                        <img src="${state.currentBattle.enemy.flag}" class="army-image" alt="${state.currentBattle.target}军">
+                        <div class="army-count">${state.currentBattle.enemy.soldiers}千士兵</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add turn-by-turn reports
+            battleResult.turns.forEach((turn, index) => {
+                const qinPercent = Math.round((turn.qinSoldiers / state.selectedSoldiers) * 100);
+                const enemyPercent = Math.round((turn.enemySoldiers / state.currentBattle.enemy.soldiers) * 100);
+                
+                reportHTML += `
+                    <div class="battle-turn">
+                        <div class="battle-description">
+                            <strong>第${index + 1}回合:</strong> ${turn.description}
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${qinPercent}%"></div>
+                            </div>
+                            <div class="army-count">秦军剩余: ${turn.qinSoldiers}千 (${qinPercent}%)</div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${enemyPercent}%"></div>
+                            </div>
+                            <div class="army-count">${state.currentBattle.target}军剩余: ${turn.enemySoldiers}千 (${enemyPercent}%)</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add final outcome
+            reportHTML += `
+                <div class="battle-outcome">
+                    <p>${battleResult.victory ? '大获全胜!' : '战斗失败!'}</p>
+                    <p>秦军损失: ${state.selectedSoldiers - battleResult.qinSurvivors}千士兵</p>
+                    <p>${state.currentBattle.target}军损失: ${state.currentBattle.enemy.soldiers - battleResult.enemySurvivors}千士兵</p>
+                    ${battleResult.victory ? 
+                        `<p>获得战利品: ${Math.floor(state.currentBattle.enemy.soldiers * 0.5)}万金</p>` : 
+                        `<p>民心下降: 10</p>`}
+                </div>
+            `;
+            
+            document.getElementById('battle-report').innerHTML = reportHTML;
+            document.getElementById('battle-report').style.display = 'block';
+        }
+
+        function simulateBattle(qinSoldiers, enemySoldiers, enemyTactics, surprise) {
+            const turns = [];
+            let qinCurrent = qinSoldiers;
+            let enemyCurrent = enemySoldiers;
+            const qinTactics = 80; // Base Qin tactics
+            const surpriseBonus = surprise ? 1.2 : 1;
+            
+            // Battle turns (3-5 rounds)
+            const totalRounds = 3 + Math.floor(Math.random() * 3);
+            
+            for (let i = 0; i < totalRounds; i++) {
+                // Calculate effectiveness
+                const qinEffect = (qinCurrent / qinSoldiers) * qinTactics * surpriseBonus;
+                const enemyEffect = (enemyCurrent / enemySoldiers) * enemyTactics;
+                
+                // Calculate losses
+                const qinLosses = Math.floor(enemyEffect * 0.1 * (0.8 + Math.random() * 0.4));
+                const enemyLosses = Math.floor(qinEffect * 0.1 * (0.8 + Math.random() * 0.4));
+                
+                // Apply losses
+                qinCurrent = Math.max(0, qinCurrent - qinLosses);
+                enemyCurrent = Math.max(0, enemyCurrent - enemyLosses);
+                
+                // Determine round description
+                let description = "";
+                const randomEvent = Math.random();
+                
+                if (randomEvent < 0.1) {
+                    description = "秦军使用连弩齐射，对敌军造成重大伤亡";
+                } else if (randomEvent < 0.2) {
+                    description = "敌军使用战车冲锋，秦军阵型被冲破";
+                } else if (randomEvent < 0.3 && surprise) {
+                    description = "突袭效果显著，敌军陷入混乱";
+                } else if (qinLosses < enemyLosses * 0.7) {
+                    description = "秦军占据上风，给予敌军重创";
+                } else if (enemyLosses < qinLosses * 0.7) {
+                    description = "敌军顽强抵抗，秦军损失较大";
+                } else {
+                    description = "双方势均力敌，战斗胶着";
+                }
+                
+                turns.push({
+                    description: description,
+                    qinSoldiers: qinCurrent,
+                    enemySoldiers: enemyCurrent
+                });
+                
+                // Early victory/defeat
+                if (qinCurrent <= 0 || enemyCurrent <= 0) break;
+            }
+            
+            return {
+                victory: enemyCurrent <= 0 || (qinCurrent > enemyCurrent * 1.5),
+                qinSurvivors: qinCurrent,
+                enemySurvivors: enemyCurrent,
+                turns: turns
+            };
+        }
+
+        function nextScene() {
+            document.getElementById('battle-report').style.display = 'none';
+            document.getElementById('battle-animation').style.display = 'none';
+            
+            const ending = checkEnding();
+            if (ending) {
+                document.getElementById('story').innerHTML = `<p>${ending}</p>`;
+                document.getElementById('options').innerHTML = '<button onclick="location.reload()">重新开始</button>';
+                document.getElementById('ending').style.display = 'block';
+                document.getElementById('ending').textContent = "游戏结束";
+                return;
+            }
+            
+            state.currentScene++;
+            if (state.currentScene > scenes.length) {
+                state.currentScene = 1; // Loop through scenes if not ended
+            }
+            
+            showScene();
+        }
+
+        function makeChoice(optionIndex) {
+            if (state.currentScene === 0 && optionIndex === 1) {
+                // Start game
+                state.currentScene = 1;
+                showScene();
+                return;
+            }
+            
+            const scene = scenes[state.currentScene - 1];
+            const choice = scene.options[optionIndex - 1];
+            
+            if (choice.effect) {
+                applyEffects(choice.effect);
+                updateStats();
+                
+                const ending = checkEnding();
+                if (ending) {
+                    document.getElementById('story').innerHTML = `<p>${ending}</p>`;
+                    document.getElementById('options').innerHTML = '<button onclick="location.reload()">重新开始</button>';
+                    document.getElementById('ending').style.display = 'block';
+                    document.getElementById('ending').textContent = "游戏结束";
+                    return;
+                }
+            }
+            
+            if (choice.action === "prepareBattle") {
+                prepareBattle(choice.target, choice.surprise);
+            } else {
+                nextScene();
+            }
+        }
+
+        function showScene() {
+            const scene = scenes[state.currentScene - 1];
+            document.getElementById('story').innerHTML = `<p>${scene.text}</p>`;
+            
+            let optionsHTML = '';
+            scene.options.forEach((option, index) => {
+                optionsHTML += `<button onclick="makeChoice(${index + 1})">${option.text}</button>`;
+            });
+            
+            document.getElementById('options').innerHTML = optionsHTML;
+        }
+
+        // Initialize game
+        document.getElementById('soldier-slider').addEventListener('input', updateSoldierCount);
+        updateStats();
+    </script>
+</body>
+</html>
