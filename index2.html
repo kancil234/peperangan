@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秦灭六国统一战争</title>
+    <style>
+        body {
+            font-family: 'SimSun', '宋体', serif;
+            background-color: #f5e8c0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18487.jpg.webp?v=1704379735');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        #game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #game-content {
+            background-color: rgba(255, 255, 255, 0.92);
+            border: 3px solid #8B4513;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+        h1 {
+            color: #8B0000;
+            text-align: center;
+            text-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+            border-bottom: 3px solid #8B4513;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+        #story {
+            margin-bottom: 25px;
+            line-height: 1.7;
+            min-height: 180px;
+            background-color: rgba(255, 253, 245, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d4b483;
+            font-size: 17px;
+        }
+        #options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #8B4513;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 17px;
+            transition: all 0.3s;
+            font-family: 'SimSun', '宋体', serif;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background-color: #A0522D;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        #stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding: 18px;
+            background-color: rgba(139, 69, 19, 0.15);
+            border-radius: 8px;
+            border: 1px solid #d4b483;
+        }
+        .stat {
+            text-align: center;
+            min-width: 120px;
+            padding: 5px;
+        }
+        .stat-label {
+            font-size: 15px;
+            color: #5a3921;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 20px;
+            color: #8B0000;
+        }
+        #map-container {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+            background-color: rgba(255, 253, 245, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d4b483;
+        }
+        #map {
+            max-width: 100%;
+            height: auto;
+            border: 3px solid #8B4513;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        .conquered-overlay {
+            position: absolute;
+            background-color: rgba(139, 0, 0, 0.35);
+            border: 2px solid #8B0000;
+            border-radius: 8px;
+            pointer-events: none;
+            transition: all 0.5s;
+        }
+        #ending {
+            display: none;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: #8B0000;
+            margin: 30px 0;
+            padding: 25px;
+            background-color: rgba(255, 245, 230, 0.95);
+            border-radius: 8px;
+            border: 2px solid #8B4513;
+        }
+        #battle-report {
+            margin: 25px 0;
+            padding: 20px;
+            background-color: rgba(255, 245, 230, 0.95);
+            border-left: 5px solid #8B0000;
+            display: none;
+            border-radius: 0 8px 8px 0;
+        }
+        #soldier-selector {
+            margin: 20px 0;
+            display: none;
+            background-color: rgba(255, 245, 230, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d4b483;
+        }
+        #soldier-slider {
+            width: 100%;
+            height: 12px;
+            margin: 20px 0;
+            -webkit-appearance: none;
+            background: #d4b483;
+            border-radius: 6px;
+        }
+        #soldier-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #8B0000;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #soldier-count {
+            text-align: center;
+            font-weight: bold;
+            font-size: 22px;
+            color: #8B0000;
+            margin: 10px 0;
+        }
+        .enemy-info {
+            font-style: italic;
+            color: #8B0000;
+            margin: 15px 0;
+            padding: 12px;
+            background-color: rgba(139, 0, 0, 0.12);
+            border-radius: 8px;
+            border-left: 3px solid #8B0000;
+        }
+        .battle-turn {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #8B4513;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .battle-images {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 20px 0;
+            background-color: rgba(139, 69, 19, 0.15);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #d4b483;
+        }
+        .army-image {
+            width: 150px;
+            height: 120px;
+            object-fit: contain;
+            transition: all 0.5s;
+            filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.3));
+        }
+        .vs-text {
+            font-size: 32px;
+            font-weight: bold;
+            color: #8B0000;
+            margin: 0 25px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .battle-outcome {
+            font-weight: bold;
+            margin: 25px 0;
+            color: #8B0000;
+            text-align: center;
+            font-size: 24px;
+            padding: 20px;
+            background-color: rgba(139, 0, 0, 0.15);
+            border-radius: 8px;
+            border: 1px solid #8B4513;
+        }
+        .battle-description {
+            flex-grow: 1;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #e0c9a6;
+            border-radius: 8px;
+            margin: 15px 0;
+            height: 25px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            width: 100%;
+            transition: width 1s;
+        }
+        .qin-progress {
+            background: linear-gradient(90deg, #8B0000, #A0522D);
+            box-shadow: 0 2px 5px rgba(139, 0, 0, 0.3);
+        }
+        .enemy-progress {
+            background: linear-gradient(90deg, #1E3F66, #3A6EA5);
+            box-shadow: 0 2px 5px rgba(30, 63, 102, 0.3);
+        }
+        .army-count {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+        #battle-animation {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .battlefield {
+            position: relative;
+            height: 350px;
+            background-image: url('https://www.worldhistory.org/img/r/p/1000x1200/18488.jpg.webp?v=1704379735');
+            background-size: cover;
+            border: 4px solid #8B4513;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .soldier {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: all 1s;
+            filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.5));
+            z-index: 2;
+        }
+        .qin-soldier {
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18490.png.webp?v=1704379735');
+            left: 15%;
+        }
+        .enemy-soldier {
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18491.png.webp?v=1704379735');
+            right: 15%;
+        }
+        .arrow {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18489.png.webp?v=1704379735');
+            background-size: contain;
+            z-index: 3;
+            transform: rotate(-45deg);
+            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.5));
+        }
+        .battle-flag {
+            position: absolute;
+            width: 80px;
+            height: 60px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 4;
+            filter: drop-shadow(3px 3px 5px rgba(0,0,0,0.5));
+        }
+        .qin-flag {
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18492.png.webp?v=1704379735');
+            left: 10%;
+            top: 20px;
+        }
+        .enemy-flag {
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18493.png.webp?v=1704379735');
+            right: 10%;
+            top: 20px;
+        }
+        #next-battle-btn {
+            display: none;
+            margin: 30px auto;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #8B0000;
+            width: 200px;
+        }
+        .territory-highlight {
+            position: absolute;
+            background-color: rgba(139, 0, 0, 0.4);
+            border: 3px solid #8B0000;
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 5;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .battle-title {
+            text-align: center;
+            font-size: 24px;
+            color: #8B0000;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .battle-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #5a3921;
+            margin-bottom: 20px;
+        }
+        .historical-note {
+            font-size: 14px;
+            color: #5a3921;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        #animated-map {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        #animated-map-content {
+            position: relative;
+            width: 80%;
+            max-width: 900px;
+        }
+        #animated-map-img {
+            width: 100%;
+            border: 5px solid #8B4513;
+            border-radius: 10px;
+        }
+        .map-army {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+        }
+        .map-qin-army {
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18490.png.webp?v=1704379735');
+        }
+        .map-enemy-army {
+            background-image: url('https://www.worldhistory.org/img/r/p/500x600/18491.png.webp?v=1704379735');
+        }
+        #close-map {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #8B0000;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 101;
+        }
+        #map-view-btn {
+            margin: 10px auto;
+            display: block;
+            background-color: #8B4513;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-content">
+            <h1>秦灭六国统一战争 (前230-前221年)</h1>
+            
+            <div id="story">
+                <p>公元前246年，年仅13岁的嬴政继承秦王位。此时战国七雄中，秦国经过商鞅变法已发展成为最强大的国家。你的目标是在亲政后，完成统一六国的大业，建立中国历史上第一个中央集权的帝国。</p>
+                <p>你将面临军事征服、外交博弈、内政治理等多方面的挑战。每个决策都将影响统一进程，决定秦国能否完成这一历史伟业。</p>
+                <p class="historical-note">历史背景：秦国最终在前230年至前221年间先后灭韩、赵、魏、楚、燕、齐六国，完成统一，建立秦朝。</p>
+            </div>
+            
+            <div id="options">
+                <button onclick="makeChoice(1)">开始统一战争</button>
+            </div>
+            
+            <div id="soldier-selector">
+                <h3 class="battle-title">军事部署</h3>
+                <p class="battle-subtitle">准备进攻 ${state.currentBattle?.target || ""}</p>
+                <p>选择出征士兵数量: <span id="soldier-count">0</span>千</p>
+                <input type="range" id="soldier-slider" min="0" max="100" value="0">
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span>0千</span>
+                    <span>50千</span>
+                    <span>100千</span>
+                </div>
+                <button id="confirm-battle" onclick="confirmBattle()">下达出征命令</button>
+                <p class="historical-note">历史参考：秦灭楚之战中，王翦率60万秦军攻楚，是战国时期规模最大的战役之一。</p>
+            </div>
+            
+            <div id="battle-animation">
+                <h3 class="battle-title">${state.currentBattle?.target ? `秦 vs ${state.currentBattle.target}` : "两军交战"}</h3>
+                <p class="battle-subtitle">${state.currentBattle?.surprise ? "突袭作战" : "正面会战"}</p>
+                <div class="battlefield" id="battlefield"></div>
+            </div>
+            
+            <div id="battle-report"></div>
+            <button id="next-battle-btn" onclick="continueAfterBattle()">继续征程</button>
+            
+            <div id="stats">
+                <div class="stat">
+                    <div class="stat-label">军队</div>
+                    <div class="stat-value" id="military">100</div>
+                    <div>千士兵</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">民心</div>
+                    <div class="stat-value" id="popularity">70</div>
+                    <div>/100</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">国库</div>
+                    <div class="stat-value" id="treasury">80</div>
+                    <div>万金</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">年份</div>
+                    <div class="stat-value" id="year">246</div>
+                    <div>公元前</div>
+                </div>
+            </div>
+            
+            <div id="map-container">
+                <h3>战国七雄形势图</h3>
+                <p class="battle-subtitle">当前战局态势</p>
+                <img id="map" src="data:image/jpeg;base64,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" alt="战国地图">
+                <div id="conquered-overlays"></div>
+                <button id="map-view-btn" onclick="showAnimatedMap()">查看动态战略地图</button>
+                <p class="historical-note">地图显示战国后期各国疆域，红色区域为已被征服的国家</p>
+            </div>
+            
+            <div id="ending"></div>
+        </div>
+    </div>
+
+    <div id="animated-map">
+        <button id="close-map" onclick="hideAnimatedMap()">关闭</button>
+        <div id="animated-map-content">
+            <img id="animated-map-img" src="https://www.worldhistory.org/img/r/p/1000x1200/4360.jpg.webp?v=1685430385" alt="动态战略地图">
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const state = {
+            military: 100,
+            popularity: 70,
+            treasury: 80,
+            year: 246,
+            conquered: [],
+            currentScene: 0,
+            currentBattle: null,
+            selectedSoldiers: 0,
+            battleInProgress: false
+        };
+
+        // Territory coordinates (relative % of map image)
+        const territories = {
+            "秦国": { x: 15, y: 50, width: 15, height: 20, capital: {x: 20, y: 55} },
+            "韩国": { x: 50, y: 50, width: 10, height: 15, capital: {x: 52, y: 55} },
+            "赵国": { x: 45, y: 30, width: 15, height: 20, capital: {x: 50, y: 35} },
+            "魏国": { x: 55, y: 45, width: 12, height: 15, capital: {x: 58, y: 50} },
+            "楚国": { x: 40, y: 70, width: 25, height: 20, capital: {x: 50, y: 75} },
+            "燕国": { x: 70, y: 20, width: 15, height: 20, capital: {x: 75, y: 25} },
+            "齐国": { x: 75, y: 50, width: 15, height: 20, capital: {x: 80, y: 55} }
+        };
+
+        // Enemy data with historical troop strengths
+        const enemies = {
+            "韩国": { 
+                strength: 30, 
+                soldiers: 40, 
+                tactics: 60,
+                flag: "https://www.worldhistory.org/img/r/p/500x600/18493.png.webp?v=1704379735",
+                color: "#3A6EA5"
+            },
+            "赵国": { 
+                strength: 50, 
+                soldiers: 60, 
+                tactics: 70,
+                flag: "https://www.worldhistory.org/img/r/p/500x600/18495.png.webp?v=1704379735",
+                color: "#1E3F66"
+            },
+            "魏国": { 
+                strength: 40, 
+                soldiers: 50, 
+                tactics: 65,
+                flag: "https://www.worldhistory.org/img/r/p/500x600/18494.png.webp?v=1704379735",
+                color: "#4B8BBE"
+            },
+            "楚国": { 
+                strength: 70, 
+                soldiers: 80, 
+                tactics: 75,
+                flag: "https://www.worldhistory.org/img/r/p/500x600/18496.png.webp?v=1704379735",
+                color: "#2D572C"
+            },
+            "燕国": { 
+                strength: 35, 
+                soldiers: 45, 
+                tactics: 55,
+                flag: "https://www.worldhistory.org/img/r/p/500x600/18497.png.webp?v=1704379735",
+                color: "#5A3921"
+            },
+            "齐国": { 
+                strength: 60, 
+                soldiers: 70, 
+                tactics: 80,
+                flag: "https://www.worldhistory.org/img/r/p/500x600/18498.png.webp?v=1704379735",
+                color: "#E6B422"
+            }
+        };
+
+        // Historical battle scenes with more context
+        const scenes = [
+            {
+                text: "你刚刚亲政，秦国经过历代变法已成为七雄中最强大的国家。丞相吕不韦建议先巩固内政发展经济，而将军王翦则主张立即攻打最弱小的韩国。你会如何决策？",
+                options: [
+                    { text: "采纳吕不韦建议，发展农业和军事工业", 
+                      effect: { military: 15, popularity: 10, treasury: -25, year: 2 },
+                      note: "历史参考：秦国重视农业发展，修建郑国渠等水利工程" },
+                    { text: "支持王翦，准备攻打韩国", 
+                      action: "prepareBattle", target: "韩国",
+                      note: "历史事实：前230年，秦内史腾率军攻韩，韩王安投降" },
+                    { text: "双管齐下，一边发展一边准备战争", 
+                      effect: { military: -5, popularity: -5, treasury: -15, year: 2 },
+                      note: "风险：可能两面都难以取得显著成效" }
+                ]
+            },
+            {
+                text: "灭韩后，其他五国震动。赵国派使者提议联合对抗齐国。同时赵国名将李牧正率军防守边境。你会采取什么策略？",
+                options: [
+                    { text: "接受联盟，先集中力量攻打齐国", 
+                      action: "prepareBattle", target: "齐国",
+                      note: "风险：齐国距离较远，远征消耗大" },
+                    { text: "拒绝联盟，准备攻打赵国", 
+                      action: "prepareBattle", target: "赵国",
+                      note: "历史事实：前229年，秦用反间计使赵王杀李牧，次年攻破邯郸" },
+                    { text: "假装同意联盟，实则准备偷袭赵国", 
+                      effect: { popularity: -15, action: "prepareBattle", target: "赵国", surprise: true },
+                      note: "风险：失信于诸侯，可能影响日后招降" }
+                ]
+            },
+            {
+                text: "随着领土扩张，你需要决定如何管理新征服的地区。大臣们对统治政策有不同意见：",
+                options: [
+                    { text: "实行郡县制，废除分封，直接中央管辖", 
+                      effect: { popularity: -20, military: 15, treasury: 10, year: 1 },
+                      note: "历史事实：秦始皇最终全面推行郡县制" },
+                    { text: "保留当地贵族，实行间接统治", 
+                      effect: { popularity: 10, military: -10, year: 1 },
+                      note: "风险：地方势力可能反叛" },
+                    { text: "强制移民，将秦人迁往新领土", 
+                      effect: { popularity: -25, military: 20, treasury: -15, year: 2 },
+                      note: "历史参考：秦曾迁富豪至咸阳加强控制" }
+                ]
+            },
+            {
+                text: "楚国联合魏国准备合纵抗秦。楚国地域辽阔，军力强大。你会采取什么策略应对？",
+                options: [
+                    { text: "派间谍离间楚魏联盟", 
+                      effect: { military: 10, treasury: -20, conquered: ["魏国"], year: 2 },
+                      note: "历史事实：秦擅长用反间计破坏六国联盟" },
+                    { text: "先发制人，全力攻打楚国", 
+                      action: "prepareBattle", target: "楚国",
+                      note: "历史参考：前224年，王翦率60万秦军灭楚" },
+                    { text: "修建防御工事，等待对方进攻", 
+                      effect: { military: 15, popularity: 10, treasury: -25, year: 2 },
+                      note: "风险：可能丧失战略主动权" }
+                ]
+            },
+            {
+                text: "仅剩燕国和齐国未征服。燕国太子丹派荆轲刺秦失败后，燕王喜逃往辽东。你会如何完成最后统一？",
+                options: [
+                    { text: "立即派大军追击燕王，彻底消灭燕国", 
+                      action: "prepareBattle", target: "燕国",
+                      note: "历史事实：前222年，秦将王贲攻辽东俘燕王喜" },
+                    { text: "先稳定已征服地区，再处理燕国", 
+                      effect: { military: 15, popularity: 15, treasury: -20, year: 2 },
+                      note: "稳妥策略但延缓统一进程" },
+                    { text: "派使者威胁齐国投降，避免最后大战", 
+                      effect: { military: 5, popularity: -10, treasury: -10, conquered: ["齐国", "燕国"], year: 1 },
+                      note: "历史事实：前221年，齐王建不战降秦" }
+                ]
+            }
+        ];
+
+        // Initialize conquered territories display
+        function updateConqueredTerritories() {
+            const mapImg = document.getElementById('map');
+            const overlaysContainer = document.getElementById('conquered-overlays');
+            
+            // Clear existing overlays
+            overlaysContainer.innerHTML = '';
+            
+            // Add overlays for conquered territories
+            state.conquered.forEach(territory => {
+                if (territories[territory]) {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'conquered-overlay';
+                    
+                    // Calculate position based on map dimensions
+                    const mapRect = mapImg.getBoundingClientRect();
+                    const left = (territories[territory].x / 100) * mapRect.width;
+                    const top = (territories[territory].y / 100) * mapRect.height;
+                    const width = (territories[territory].width / 100) * mapRect.width;
+                    const height = (territories[territory].height / 100) * mapRect.height;
+                    
+                    overlay.style.left = `${left}px`;
+                    overlay.style.top = `${top}px`;
+                    overlay.style.width = `${width}px`;
+                    overlay.style.height = `${height}px`;
+                    
+                    overlaysContainer.appendChild(overlay);
+                }
+            });
+        }
+
+        // Show animated map with troop movements
+        function showAnimatedMap() {
+            const animatedMap = document.getElementById('animated-map');
+            const mapImg = document.getElementById('animated-map-img');
+            const mapContent = document.getElementById('animated-map-content');
+            
+            // Update map image based on conquest status
+            if (state.conquered.length >= 6) {
+                mapImg.src = "https://www.worldhistory.org/img/r/p/1000x1200/4362.jpg.webp?v=1685430385";
+            } else {
+                mapImg.src = "https://www.worldhistory.org/img/r/p/1000x1200/4360.jpg.webp?v=1685430385";
+            }
+            
+            animatedMap.style.display = 'flex';
+            
+            // Clear any existing army markers
+            const existingMarkers = document.querySelectorAll('.map-army');
+            existingMarkers.forEach(marker => marker.remove());
+            
+            // Add Qin army marker
+            const qinMarker = document.createElement('div');
+            qinMarker.className = 'map-army map-qin-army';
+            const qinRect = mapImg.getBoundingClientRect();
+            const qinLeft = (territories["秦国"].capital.x / 100) * qinRect.width;
+            const qinTop = (territories["秦国"].capital.y / 100) * qinRect.height;
+            qinMarker.style.left = `${qinLeft}px`;
+            qinMarker.style.top = `${qinTop}px`;
+            mapContent.appendChild(qinMarker);
+            
+            // Add enemy markers for unconquered territories
+            Object.keys(territories).forEach(territory => {
+                if (territory !== "秦国" && !state.conquered.includes(territory)) {
+                    const enemyMarker = document.createElement('div');
+                    enemyMarker.className = 'map-army map-enemy-army';
+                    const enemyLeft = (territories[territory].capital.x / 100) * qinRect.width;
+                    const enemyTop = (territories[territory].capital.y / 100) * qinRect.height;
+                    enemyMarker.style.left = `${enemyLeft}px`;
+                    enemyMarker.style.top = `${enemyTop}px`;
+                    mapContent.appendChild(enemyMarker);
+                    
+                    // Animate troop movements if currently battling this territory
+                    if (state.currentBattle?.target === territory) {
+                        animateMapBattle(qinMarker, enemyMarker, territory);
+                    }
+                }
+            });
+        }
+
+        function animateMapBattle(qinMarker, enemyMarker, territory) {
+            // Move Qin army towards enemy territory
+            const mapImg = document.getElementById('animated-map-img');
+            const mapRect = mapImg.getBoundingClientRect();
+            const targetLeft = (territories[territory].capital.x / 100) * mapRect.width;
+            const targetTop = (territories[territory].capital.y / 100) * mapRect.height;
+            
+            // Calculate midpoint for battle
+            const qinLeft = parseInt(qinMarker.style.left);
+            const qinTop = parseInt(qinMarker.style.top);
+            const midX = (qinLeft + targetLeft) / 2;
+            const midY = (qinTop + targetTop) / 2;
+            
+            // Move Qin army to midpoint
+            qinMarker.style.transition = 'all 2s ease-in-out';
+            qinMarker.style.left = `${midX}px`;
+            qinMarker.style.top = `${midY}px`;
+            
+            // Move enemy army to midpoint
+            enemyMarker.style.transition = 'all 2s ease-in-out';
+            enemyMarker.style.left = `${midX}px`;
+            enemyMarker.style.top = `${midY}px`;
+            
+            // After reaching midpoint, animate battle
+            setTimeout(() => {
+                // Add some visual effect for battle
+                const battleEffect = document.createElement('div');
+                battleEffect.style.position = 'absolute';
+                battleEffect.style.left = `${midX - 25}px`;
+                battleEffect.style.top = `${midY - 25}px`;
+                battleEffect.style.width = '50px';
+                battleEffect.style.height = '50px';
+                battleEffect.style.backgroundColor = 'rgba(255,0,0,0.5)';
+                battleEffect.style.borderRadius = '50%';
+                battleEffect.style.zIndex = '11';
+                battleEffect.style.animation = 'pulse 0.5s 4';
+                document.getElementById('animated-map-content').appendChild(battleEffect);
+                
+                // Remove effect after animation
+                setTimeout(() => {
+                    battleEffect.remove();
+                    
+                    // Return armies to their capitals
+                    qinMarker.style.left = `${(territories["秦国"].capital.x / 100) * mapRect.width}px`;
+                    qinMarker.style.top = `${(territories["秦国"].capital.y / 100) * mapRect.height}px`;
+                    
+                    // If conquered, remove enemy marker, else return it
+                    if (state.conquered.includes(territory)) {
+                        enemyMarker.remove();
+                    } else {
+                        enemyMarker.style.left = `${targetLeft}px`;
+                        enemyMarker.style.top = `${targetTop}px`;
+                    }
+                }, 2000);
+            }, 2000);
+        }
+
+        function hideAnimatedMap() {
+            document.getElementById('animated-map').style.display = 'none';
+        }
+
+        // Game functions
+        function updateStats() {
+            document.getElementById('military').textContent = state.military;
+            document.getElementById('popularity').textContent = state.popularity;
+            document.getElementById('treasury').textContent = state.treasury;
+            document.getElementById('year').textContent = state.year;
+            updateConqueredTerritories();
+        }
+
+        function applyEffects(effects) {
+            state.military = Math.max(0, state.military + (effects.military || 0));
+            state.popularity = Math.max(0, state.popularity + (effects.popularity || 0));
+            state.treasury = Math.max(0, state.treasury + (effects.treasury || 0));
+            state.year -= effects.year || 0;
+            
+            if (effects.conquered) {
+                effects.conquered.forEach(country => {
+                    if (!state.conquered.includes(country)) {
+                        state.conquered.push(country);
+                    }
+                });
+            }
+            updateStats();
+        }
+
+        function checkEnding() {
+            if (state.military <= 0) {
+                return "你的军队消耗殆尽，被六国联军反击。秦国灭亡，统一大业失败！";
+            }
+            if (state.popularity <= 0) {
+                return "民怨沸腾，各地爆发大规模起义。你被推翻，统一进程中断！";
+            }
+            if (state.treasury <= 0) {
+                return "国库空虚，军队粮饷不继，国家陷入混乱。统一梦想破灭！";
+            }
+            if (state.conquered.length >= 6) {
+                return `公元前${state.year}年，你成功统一六国，建立秦朝，成为中国历史上第一位皇帝——始皇帝！`;
+            }
+            if (state.year <= 221) {
+                return "时间耗尽，你未能完成统一大业。历史将你视为又一位未能统一天下的秦王...";
+            }
+            return null;
+        }
+
+        function prepareBattle(target, surprise = false) {
+            state.currentBattle = {
+                target: target,
+                enemy: {...enemies[target]},
+                surprise: surprise,
+                turns: []
+            };
+            
+            if (surprise) {
+                state.currentBattle.enemy.soldiers = Math.floor(state.currentBattle.enemy.soldiers * 0.7);
+            }
+            
+            // Update UI
+            highlightTerritory(target);
+            document.getElementById('soldier-selector').style.display = 'block';
+            document.getElementById('soldier-slider').max = state.military;
+            document.getElementById('soldier-slider').value = Math.min(60, Math.floor(state.military * 0.7));
+            updateSoldierCount();
+            
+            // Update story with enemy info
+            document.getElementById('story').innerHTML += `
+                <div class="enemy-info">
+                    <p>敌军情报: ${target}军约有${state.currentBattle.enemy.soldiers}千士兵</p>
+                    <p>${surprise ? '突袭效果: 敌军尚未完全准备，数量减少30%' : ''}</p>
+                    <p class="historical-note">历史参考：${getHistoricalBattleNote(target)}</p>
+                </div>
+            `;
+            
+            document.getElementById('options').innerHTML = '';
+        }
+
+        function getHistoricalBattleNote(target) {
+            const notes = {
+                "韩国": "前230年，秦内史腾攻韩，韩王安投降，韩成为第一个被灭的国家",
+                "赵国": "前229年，秦用反间计使赵王杀李牧，前228年攻破邯郸俘赵王迁",
+                "魏国": "前225年，秦将王贲引黄河水灌大梁，魏王假投降",
+                "楚国": "前224-223年，王翦率60万秦军击溃楚军，俘楚王负刍",
+                "燕国": "前226年秦攻占蓟城，前222年王贲俘燕王喜于辽东",
+                "齐国": "前221年，齐王建听丞相后胜计不抵抗，秦军入临淄，齐亡"
+            };
+            return notes[target] || "这是历史上的一场重要战役";
+        }
+
+        function highlightTerritory(territory) {
+            const mapImg = document.getElementById('map');
+            const mapRect = mapImg.getBoundingClientRect();
+            
+            // Remove any existing highlight
+            const existingHighlight = document.querySelector('.territory-highlight');
+            if (existingHighlight) {
+                existingHighlight.remove();
+            }
+            
+            if (territories[territory]) {
+                const highlight = document.createElement('div');
+                highlight.className = 'territory-highlight';
+                
+                const left = (territories[territory].x / 100) * mapRect.width;
+                const top = (territories[territory].y / 100) * mapRect.height;
+                const width = (territories[territory].width / 100) * mapRect.width;
+                const height = (territories[territory].height / 100) * mapRect.height;
+                
+                highlight.style.left = `${left}px`;
+                highlight.style.top = `${top}px`;
+                highlight.style.width = `${width}px`;
+                highlight.style.height = `${height}px`;
+                
+                document.getElementById('map-container').appendChild(highlight);
+            }
+        }
+
+        function updateSoldierCount() {
+            state.selectedSoldiers = parseInt(document.getElementById('soldier-slider').value);
+            document.getElementById('soldier-count').textContent = state.selectedSoldiers;
+        }
+
+        function confirmBattle() {
+            if (state.battleInProgress) return;
+            state.battleInProgress = true;
+            
+            document.getElementById('soldier-selector').style.display = 'none';
+            
+            if (state.selectedSoldiers <= 0) {
+                document.getElementById('story').innerHTML += '<p>你没有派出任何士兵，放弃了这次进攻机会。</p>';
+                nextScene();
+                return;
+            }
+            
+            // Deduct soldiers
+            state.military -= state.selectedSoldiers;
+            updateStats();
+            
+            // Show battle animation
+            showBattleAnimation(state.selectedSoldiers, state.currentBattle.enemy.soldiers);
+            
+            // Execute battle after animation
+            setTimeout(() => {
+                const battleResult = simulateBattle(
+                    state.selectedSoldiers, 
+                    state.currentBattle.enemy.soldiers,
+                    state.currentBattle.enemy.tactics,
+                    state.currentBattle.surprise
+                );
+                
+                displayBattleResult(battleResult);
+                
+                // Apply battle results
+                state.military += battleResult.qinSurvivors;
+                if (battleResult.victory) {
+                    state.conquered.push(state.currentBattle.target);
+                    state.treasury += Math.floor(state.currentBattle.enemy.soldiers * 0.5); // Loot
+                    state.popularity += 5;
+                } else {
+                    state.popularity -= 10;
+                }
+                
+                updateStats();
+                document.getElementById('next-battle-btn').style.display = 'block';
+            }, 5000); // Longer battle animation
+        }
+
+        function continueAfterBattle() {
+            state.battleInProgress = false;
+            document.getElementById('next-battle-btn').style.display = 'none';
+            nextScene();
+        }
+
+        function showBattleAnimation(qinSoldiers, enemySoldiers) {
+            const battlefield = document.getElementById('battlefield');
+            battlefield.innerHTML = '';
+            document.getElementById('battle-animation').style.display = 'block';
+            
+            // Update battle title
+            document.querySelector('#battle-animation .battle-title').textContent = 
+                `秦军 vs ${state.currentBattle.target}军`;
+            document.querySelector('#battle-animation .battle-subtitle').textContent = 
+                state.currentBattle.surprise ? "突袭作战" : "正面会战";
+            
+            // Add flags
+            const qinFlag = document.createElement('div');
+            qinFlag.className = 'battle-flag qin-flag';
+            battlefield.appendChild(qinFlag);
+            
+            const enemyFlag = document.createElement('div');
+            enemyFlag.className = 'battle-flag enemy-flag';
+            battlefield.appendChild(enemyFlag);
+            
+            // Scale down for display but keep proportions
+            const scaleFactor = 0.05; // Show 5% of actual numbers for performance
+            const qinCount = Math.min(50, Math.ceil(qinSoldiers * scaleFactor));
+            const enemyCount = Math.min(50, Math.ceil(enemySoldiers * scaleFactor));
+            
+            // Create Qin soldiers in formation
+            for (let i = 0; i < qinCount; i++) {
+                const soldier = document.createElement('div');
+                soldier.className = 'soldier qin-soldier';
+                
+                // Arrange in rough formation
+                const row = Math.floor(i / 10);
+                const col = i % 10;
+                const offsetX = col * 5;
+                const offsetY = row * 8;
+                
+                soldier.style.top = `${40 + offsetY}px`;
+                soldier.style.left = `${30 + offsetX}px`;
+                
+                // Add slight variation
+                soldier.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+                soldier.style.transitionDelay = `${Math.random() * 0.5}s`;
+                
+                battlefield.appendChild(soldier);
+            }
+            
+            // Create enemy soldiers in formation
+            for (let i = 0; i < enemyCount; i++) {
+                const soldier = document.createElement('div');
+                soldier.className = 'soldier enemy-soldier';
+                
+                // Arrange in rough formation
+                const row = Math.floor(i / 10);
+                const col = i % 10;
+                const offsetX = col * 5;
+                const offsetY = row * 8;
+                
+                soldier.style.top = `${40 + offsetY}px`;
+                soldier.style.right = `${30 + offsetX}px`;
+                
+                // Add slight variation
+                soldier.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+                soldier.style.transitionDelay = `${Math.random() * 0.5}s`;
+                
+                battlefield.appendChild(soldier);
+            }
+            
+            // Animate battle sequence
+            setTimeout(() => {
+                const qinSoldiers = document.querySelectorAll('.qin-soldier');
+                const enemySoldiers = document.querySelectorAll('.enemy-soldier');
+                
+                // Move towards each other
+                qinSoldiers.forEach(soldier => {
+                    const currentLeft = parseInt(soldier.style.left);
+                    soldier.style.left = `${currentLeft + 70}px`;
+                });
+                
+                enemySoldiers.forEach(soldier => {
+                    const currentRight = parseInt(soldier.style.right);
+                    soldier.style.right = `${currentRight + 70}px`;
+                });
+                
+                // Move flags forward
+                document.querySelector('.qin-flag').style.left = "25%";
+                document.querySelector('.enemy-flag').style.right = "25%";
+                
+                // Arrow volleys
+                for (let volley = 0; volley < 3; volley++) {
+                    setTimeout(() => {
+                        // Qin arrows
+                        for (let i = 0; i < 8; i++) {
+                            setTimeout(() => {
+                                const arrow = document.createElement('div');
+                                arrow.className = 'arrow';
+                                arrow.style.top = `${60 + i * 15}px`;
+                                arrow.style.left = '35%';
+                                battlefield.appendChild(arrow);
+                                
+                                setTimeout(() => {
+                                    arrow.style.left = '65%';
+                                    setTimeout(() => {
+                                        arrow.remove();
+                                    }, 600);
+                                }, 100);
+                            }, i * 100);
+                        }
+                        
+                        // Enemy arrows
+                        for (let i = 0; i < 6; i++) {
+                            setTimeout(() => {
+                                const arrow = document.createElement('div');
+                                arrow.className = 'arrow';
+                                arrow.style.top = `${60 + i * 15}px`;
+                                arrow.style.left = '65%';
+                                arrow.style.transform = 'rotate(135deg)';
+                                battlefield.appendChild(arrow);
+                                
+                                setTimeout(() => {
+                                    arrow.style.left = '35%';
+                                    setTimeout(() => {
+                                        arrow.remove();
+                                    }, 600);
+                                }, 100);
+                            }, i * 100);
+                        }
+                    }, volley * 1000);
+                }
+                
+                // Soldier casualties
+                setTimeout(() => {
+                    const casualties = Math.min(10, qinCount, enemyCount);
+                    for (let i = 0; i < casualties; i++) {
+                        setTimeout(() => {
+                            // Randomly select soldiers to fall
+                            if (qinSoldiers[i] && Math.random() > 0.3) {
+                                qinSoldiers[i].style.transform = 'rotate(90deg)';
+                                qinSoldiers[i].style.opacity = '0.3';
+                                qinSoldiers[i].style.filter = 'grayscale(80%)';
+                            }
+                            if (enemySoldiers[i] && Math.random() > 0.3) {
+                                enemySoldiers[i].style.transform = 'rotate(90deg)';
+                                enemySoldiers[i].style.opacity = '0.3';
+                                enemySoldiers[i].style.filter = 'grayscale(80%)';
+                            }
+                        }, i * 300);
+                    }
+                }, 1500);
+                
+                // Final clash
+                setTimeout(() => {
+                    // Some soldiers break formation
+                    qinSoldiers.forEach((soldier, i) => {
+                        if (i % 3 === 0) {
+                            soldier.style.left = `${parseInt(soldier.style.left) + 20}px`;
+                        }
+                    });
+                    
+                    enemySoldiers.forEach((soldier, i) => {
+                        if (i % 3 === 0) {
+                            soldier.style.right = `${parseInt(soldier.style.right) + 20}px`;
+                        }
+                    });
+                }, 2500);
+            }, 500);
+        }
+
+        function displayBattleResult(battleResult) {
+            document.getElementById('battle-animation').style.display = 'none';
+            
+            let reportHTML = `
+                <h3 class="battle-title">${battleResult.victory ? "捷报" : "战报"}: 秦 vs ${state.currentBattle.target}</h3>
+                <p class="battle-subtitle">${state.currentBattle.surprise ? "突袭作战" : "正面会战"} · 公元前${state.year}年</p>
+            `;
+            
+            // Add army flags and initial counts
+            reportHTML += `
+                <div class="battle-images">
+                    <div>
+                        <img src="https://www.worldhistory.org/img/r/p/500x600/18492.png.webp?v=1704379735" class="army-image" alt="秦军">
+                        <div class="army-count">秦军: ${state.selectedSoldiers}千士兵</div>
+                    </div>
+                    <div class="vs-text">VS</div>
+                    <div>
+                        <img src="${state.currentBattle.enemy.flag}" class="army-image" alt="${state.currentBattle.target}军">
+                        <div class="army-count">${state.currentBattle.target}军: ${state.currentBattle.enemy.soldiers}千士兵</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add turn-by-turn reports
+            battleResult.turns.forEach((turn, index) => {
+                const qinPercent = Math.round((turn.qinSoldiers / state.selectedSoldiers) * 100);
+                const enemyPercent = Math.round((turn.enemySoldiers / state.currentBattle.enemy.soldiers) * 100);
+                
+                reportHTML += `
+                    <div class="battle-turn">
+                        <div class="battle-description">
+                            <strong>第${index + 1}回合:</strong> ${turn.description}
+                            <div class="progress-container">
+                                <div class="progress-bar qin-progress" style="width: ${qinPercent}%"></div>
+                            </div>
+                            <div class="army-count">秦军剩余: ${turn.qinSoldiers}千 (${qinPercent}%)</div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar enemy-progress" style="width: ${enemyPercent}%"></div>
+                            </div>
+                            <div class="army-count">${state.currentBattle.target}军剩余: ${turn.enemySoldiers}千 (${enemyPercent}%)</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Add final outcome
+            reportHTML += `
+                <div class="battle-outcome">
+                    <p>${battleResult.victory ? '🎉 秦军大获全胜! 🎉' : '💀 秦军战斗失败! 💀'}</p>
+                    <p>秦军损失: ${state.selectedSoldiers - battleResult.qinSurvivors}千士兵</p>
+                    <p>${state.currentBattle.target}军损失: ${state.currentBattle.enemy.soldiers - battleResult.enemySurvivors}千士兵</p>
+                    ${battleResult.victory ? 
+                        `<p>获得战利品: ${Math.floor(state.currentBattle.enemy.soldiers * 0.5)}万金</p>
+                         <p>成功征服${state.currentBattle.target}!</p>
+                         <p class="historical-note">${getHistoricalConquestNote(state.currentBattle.target)}</p>` : 
+                        `<p>民心下降: 10</p>
+                         <p>未能攻占${state.currentBattle.target}</p>`}
+                </div>
+            `;
+            
+            document.getElementById('battle-report').innerHTML = reportHTML;
+            document.getElementById('battle-report').style.display = 'block';
+            
+            // Remove territory highlight
+            const highlight = document.querySelector('.territory-highlight');
+            if (highlight) highlight.remove();
+        }
+
+        function getHistoricalConquestNote(target) {
+            const notes = {
+                "韩国": "韩成为第一个被灭的国家，韩地设为颍川郡",
+                "赵国": "赵公子嘉逃往代地自立为代王，前222年被秦将王贲攻灭",
+                "魏国": "魏都大梁遭水攻后彻底毁灭，后在其地设砀郡",
+                "楚国": "楚将项燕立昌平君为楚王反秦，后被王翦击败",
+                "燕国": "燕王喜逃亡辽东，前222年被俘，燕彻底灭亡",
+                "齐国": "齐王建被迁至共地饿死，齐成为最后被灭的国家"
+            };
+            return notes[target] || "这一征服改变了战国格局";
+        }
+
+        function simulateBattle(qinSoldiers, enemySoldiers, enemyTactics, surprise) {
+            const turns = [];
+            let qinCurrent = qinSoldiers;
+            let enemyCurrent = enemySoldiers;
+            const qinTactics = 85; // Base Qin tactics (higher for historical accuracy)
+            const surpriseBonus = surprise ? 1.3 : 1;
+            
+            // Battle turns (3-5 rounds)
+            const totalRounds = 3 + Math.floor(Math.random() * 3);
+            
+            for (let i = 0; i < totalRounds; i++) {
+                // Calculate effectiveness - Qin has advantage
+                const qinEffect = (qinCurrent / qinSoldiers) * qinTactics * surpriseBonus * 1.1;
+                const enemyEffect = (enemyCurrent / enemySoldiers) * enemyTactics;
+                
+                // Calculate losses
+                let qinLosses = Math.floor(enemyEffect * 0.08 * (0.8 + Math.random() * 0.4));
+                let enemyLosses = Math.floor(qinEffect * 0.12 * (0.8 + Math.random() * 0.4));
+                
+                // Apply losses
+                qinCurrent = Math.max(0, qinCurrent - qinLosses);
+                enemyCurrent = Math.max(0, enemyCurrent - enemyLosses);
+                
+                // Determine round description with historical flavor
+                let description = "";
+                const randomEvent = Math.random();
+                
+                if (randomEvent < 0.1) {
+                    description = "秦军弩兵万箭齐发，对敌军造成重大伤亡";
+                    enemyLosses = Math.floor(enemyLosses * 1.4);
+                } else if (randomEvent < 0.2) {
+                    if (state.currentBattle.target === "赵国") {
+                        description = "赵军骑兵冲锋，突破秦军侧翼";
+                        qinLosses = Math.floor(qinLosses * 1.5);
+                    } else if (state.currentBattle.target === "楚国") {
+                        description = "楚军利用地形埋伏，重创秦军先锋";
+                        qinLosses = Math.floor(qinLosses * 1.3);
+                    } else {
+                        description = "敌军发动猛烈反击，秦军损失较大";
+                        qinLosses = Math.floor(qinLosses * 1.2);
+                    }
+                } else if (randomEvent < 0.3 && surprise) {
+                    description = "突袭效果显著，敌军阵型大乱";
+                    enemyLosses = Math.floor(enemyLosses * 1.3);
+                } else if (qinLosses < enemyLosses * 0.6) {
+                    description = "秦军锐士奋勇冲杀，敌军节节败退";
+                } else if (enemyLosses < qinLosses * 0.6) {
+                    description = "敌军顽强抵抗，秦军进攻受阻";
+                } else {
+                    description = "两军混战，胜负难分";
+                }
+                
+                // Adjust for historical outcomes (Qin usually won)
+                if (i === totalRounds - 1 && !battleResult?.victory) {
+                    if (Math.random() > 0.3) { // 70% chance to adjust in Qin's favor
+                        enemyCurrent = Math.max(0, enemyCurrent - Math.floor(enemyCurrent * 0.1));
+                        description += "，秦军最后突击取得优势";
+                    }
+                }
+                
+                turns.push({
+                    description: description,
+                    qinSoldiers: qinCurrent,
+                    enemySoldiers: enemyCurrent
+                });
+                
+                // Early victory/defeat
+                if (qinCurrent <= 0 || enemyCurrent <= 0) break;
+            }
+            
+            const victory = enemyCurrent <= 0 || (qinCurrent > enemyCurrent * 1.3);
+            
+            return {
+                victory: victory,
+                qinSurvivors: victory ? Math.max(qinCurrent, Math.floor(qinSoldiers * 0.1)) : qinCurrent,
+                enemySurvivors: enemyCurrent,
+                turns: turns
+            };
+        }
+
+        function nextScene() {
+            document.getElementById('battle-report').style.display = 'none';
+            document.getElementById('battle-animation').style.display = 'none';
+            
+            const ending = checkEnding();
+            if (ending) {
+                document.getElementById('story').innerHTML = `<p>${ending}</p>`;
+                document.getElementById('options').innerHTML = '<button onclick="location.reload()">重新开始</button>';
+                document.getElementById('ending').style.display = 'block';
+                document.getElementById('ending').textContent = "游戏结束";
+                
+                // Show full Qin empire map if conquered all
+                if (state.conquered.length >= 6) {
+                    document.getElementById('map').src = "https://www.worldhistory.org/img/r/p/1000x1200/4362.jpg.webp?v=1685430385";
+                    const overlays = document.getElementById('conquered-overlays');
+                    overlays.innerHTML = '';
+                    document.querySelector('#map-container h3').textContent = "秦帝国疆域图";
+                    document.querySelector('#map-container .battle-subtitle').textContent = "前221年统一后的版图";
+                }
+                return;
+            }
+            
+            state.currentScene++;
+            if (state.currentScene > scenes.length) {
+                state.currentScene = 1; // Loop through scenes if not ended
+            }
+            
+            showScene();
+        }
+
+        function makeChoice(optionIndex) {
+            if (state.currentScene === 0 && optionIndex === 1) {
+                // Start game
+                state.currentScene = 1;
+                showScene();
+                return;
+            }
+            
+            const scene = scenes[state.currentScene - 1];
+            const choice = scene.options[optionIndex - 1];
+            
+            if (choice.effect) {
+                applyEffects(choice.effect);
+                
+                const ending = checkEnding();
+                if (ending) {
+                    document.getElementById('story').innerHTML = `<p>${ending}</p>`;
+                    document.getElementById('options').innerHTML = '<button onclick="location.reload()">重新开始</button>';
+                    document.getElementById('ending').style.display = 'block';
+                    document.getElementById('ending').textContent = "游戏结束";
+                    return;
+                }
+            }
+            
+            if (choice.action === "prepareBattle") {
+                prepareBattle(choice.target, choice.surprise);
+            } else {
+                nextScene();
+            }
+        }
+
+        function showScene() {
+            const scene = scenes[state.currentScene - 1];
+            let sceneHTML = `<p>${scene.text}</p>`;
+            
+            // Add historical note if available
+            if (scene.options.some(opt => opt.note)) {
+                sceneHTML += `<div class="historical-note">决策提示: ${scene.options.map(opt => opt.note ? `${opt.text}: ${opt.note}` : '').filter(Boolean).join(' | ')}</div>`;
+            }
+            
+            document.getElementById('story').innerHTML = sceneHTML;
+            
+            let optionsHTML = '';
+            scene.options.forEach((option, index) => {
+                optionsHTML += `<button onclick="makeChoice(${index + 1})">${option.text}</button>`;
+            });
+            
+            document.getElementById('options').innerHTML = optionsHTML;
+        }
+
+        // Initialize game
+        document.getElementById('soldier-slider').addEventListener('input', updateSoldierCount);
+        
+        // Update territory overlays when map loads
+        document.getElementById('map').addEventListener('load', updateConqueredTerritories);
+        
+        // Handle window resize
+        window.addEventListener('resize', updateConqueredTerritories);
+        
+        updateStats();
+    </script>
+</body>
+</html>
